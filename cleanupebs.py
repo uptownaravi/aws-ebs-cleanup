@@ -1,10 +1,13 @@
-import sys
 import boto3
 from datetime import datetime
 import json
 ec2 = boto3.client('ec2')
 dynamodb = boto3.client('dynamodb')
 sns = boto3.client('sns')
+
+#changes these to the resource names created
+table='cleanup'
+snsarn='arn:aws:sns:ap-south-1:123456789000:ebs'
 
 class Cleanup:
     
@@ -40,7 +43,7 @@ class Cleanup:
     #update dunamodb table with the list of volumeId'tagged to be deleted
     def update_dynamodb(self,volumeId):
         response = dynamodb.put_item(
-            TableName='cleanup',
+            TableName=table,
             Item={'volumeId':{'S':volumeId},'updated':{'S':datetime.today().strftime('%m/%d/%y %H:%M:%S')}}
         )
         return response['ResponseMetadata']['HTTPStatusCode']
@@ -50,7 +53,7 @@ class Cleanup:
     def validate_dynamodb_entries(self):
         listofdel = []
         dynamodbItems = dynamodb.scan(
-            TableName='cleanup'
+            TableName=table
             )
         
         for items in dynamodbItems['Items']:
@@ -66,7 +69,7 @@ class Cleanup:
             except Exception as e:
                 print("volume not found ", e, " removing entry ", vol , " from table")
                 response = dynamodb.delete_item(
-                              TableName='cleanup',
+                              TableName=table,
                               Key={'volumeId':{'S':vol}}
                         )
                 print(response)
@@ -146,7 +149,7 @@ class Cleanup:
 
     def remove_entry_from_dynamodb(self, vol):
         response = dynamodb.delete_item(
-                              TableName='cleanup',
+                              TableName=table,
                               Key={'volumeId':{'S':vol}}
                         )
         print(response)
@@ -155,7 +158,7 @@ class Cleanup:
         subject = "Summary of Deleted EBS volumes and Status as available " + str (datetime.today().strftime('%m/%d/%y %H:%M:%S'))
         message = "The list of deleted volumes " + str(deletedebs) + ". And the list of available ebs volumes that are taged for deletion "+ str(volume)
         response = sns.publish(
-                    TopicArn='arn:aws:sns:ap-south-1:123456789000:ebs',
+                    TopicArn=snsarn,
                     Subject= subject,
                     Message= message
             )
