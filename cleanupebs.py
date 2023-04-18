@@ -82,7 +82,6 @@ class Cleanup:
             datetime_object = datetime.strptime(updated, '%m/%d/%y %H:%M:%S')
             today = datetime.today().strftime('%m/%d/%y %H:%M:%S')
             delay = abs(datetime.strptime(today, '%m/%d/%y %H:%M:%S') - datetime_object).days
-            print(delay)
             #check if the entry was made 1 day ago and delete tag is available. Remove volume after that.
             if delay >= 1 and delete:
                 try:
@@ -96,6 +95,10 @@ class Cleanup:
                     self.remove_entry_from_dynamodb(vol)
                 except Exception as e:
                     print("issue in deleting item from dynamodb ", e)
+            #remove the entry from the table for donotdelete tagged ebs volumes
+            for tag in tags:
+               if tag['Key'] == 'DoNotDelete':
+                  self.remove_entry_from_dynamodb(vol)
         return listofdel
 
     def update_delete_tag_of_ebs_volume(self,volumeId):
