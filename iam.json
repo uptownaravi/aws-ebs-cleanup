@@ -1,0 +1,88 @@
+//tag permissions
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DeleteTags",
+                "ec2:CreateTags"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+//volume permissions
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DeleteVolume",
+                "ec2:DescribeVolumeStatus",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeVolumeAttribute"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+//dynamodb permissions ( replace the account numbers and table names
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:UpdateItem",
+                "dynamodb:GetRecords"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:*:123456789000:table/*/stream/*",
+                "arn:aws:dynamodb:*:123456789000:table/*/index/*",
+                "arn:aws:dynamodb:ap-south-1:123456789000:table/cleanup"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "dynamodb:ListTables",
+            "Resource": "*"
+        }
+    ]
+}
+//sns permissions, change the account number and sns topic name
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "sns:ListSubscriptionsByTopic",
+                "sns:Publish",
+                "sns:GetTopicAttributes"
+            ],
+            "Resource": "arn:aws:sns:ap-south-1:123456789000:ebs"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "sns:ListTopics",
+                "sns:GetSubscriptionAttributes",
+                "sns:ListSubscriptions"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
